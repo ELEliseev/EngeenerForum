@@ -4,9 +4,12 @@ package com.example.engeenerforum;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.icu.text.MessagePattern;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -30,6 +36,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
+import static android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE;
+import static android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -89,15 +99,17 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
 
-        webView = (WebView) findViewById(R.id.ifView);
+        webView =  findViewById(R.id.ifView);
         assert webView != null;
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setAllowFileAccess(true);
-
+        webSettings.setAllowFileAccess(true);//Включает или отключает доступ к файлам внутри WebView.
+        webSettings.setBuiltInZoomControls(true); //масштабирование
+        // включаем поддержку JavaScript
+        webSettings.setDisplayZoomControls(false);//откл кнопки с лупами
         if (Build.VERSION.SDK_INT >= 21) {
-            webSettings.setMixedContentMode(0);
+            webSettings.setMixedContentMode(MIXED_CONTENT_ALWAYS_ALLOW);//Настраивает поведение WebView, когда безопасный источник пытается загрузить ресурс из незащищенного происхождения.
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else if (Build.VERSION.SDK_INT >= 19) {
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -105,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
             webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
 
-        webView.setWebViewClient(new Callback());
-        webView.loadUrl("http://liftovik.listbb.ru/index.php");
+        webView.setWebViewClient(new Callback());//дает сообщение об ошибке загрузки
+
         webView.setWebChromeClient(new WebChromeClient() {
 
             //For Android 3.0+
@@ -123,11 +135,11 @@ public class MainActivity extends AppCompatActivity {
             public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
 
                 mUM = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);//создаем неявное намерение выбрать файл
+                i.addCategory(Intent.CATEGORY_OPENABLE);//присваеваем категорю .
+                i.setType("*/*");//тип откр файлов
                 MainActivity.this.startActivityForResult(
-                        Intent.createChooser(i, "File Browser"),
+                        Intent.createChooser(i, "File Browser"),//предоставляем окно выбора программы
                         FCR);
             }
 
@@ -190,6 +202,47 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        webView.setDownloadListener(new DownloadListener() {
+
+            @Override
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+Log.d("vvv",url);
+                Log.d("vvv",userAgent);
+                Log.d("vvv",contentDisposition);
+                Log.d("vvv",mimetype);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                request.setMimeType(mimetype);
+                //------------------------COOKIE!!------------------------
+                String cookies = CookieManager.getInstance().getCookie(url);
+                request.addRequestHeader("cookie", cookies);
+                //------------------------COOKIE!!------------------------
+                request.addRequestHeader("User-Agent", userAgent);
+
+
+               // String fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
+                String contentDispositionSplit[] = contentDisposition.split("''");
+                String fileName = contentDispositionSplit[1].trim();
+                Log.d("vvv",fileName);
+                request.allowScanningByMediaScanner();
+
+                request.setAllowedOverRoaming(false);
+                request.setTitle(fileName);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+              //  Uri destinationUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/EngeenersForum/"+fileName);
+                //request.setDestinationUri(destinationUri);
+                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS + "/EngeenerForum/", fileName);
+               // request.setDestinationInExternalFilesDir(getApplicationContext(), null, "/EngeenerForum/");
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                dm.enqueue(request);
+                Toast.makeText(getApplicationContext(), "Загрузка", //To notify the Client that the file is being downloaded
+                        Toast.LENGTH_LONG).show();
+
+            }
+        });
+        webView.loadUrl("http://liftovik.listbb.ru/index.php");
+        // webView.loadUrl("http://zaycev.net/pages/46408/4640896.shtml");
     }
 
     // Create an image file
