@@ -244,10 +244,7 @@ Log.d("vvv",url);
                 request.setAllowedOverRoaming(false);
                 request.setTitle(fileName);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-              //  Uri destinationUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/EngeenersForum/"+fileName);
-                //request.setDestinationUri(destinationUri);
                 request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS + "/EngeenerForum/", fileName);
-               // request.setDestinationInExternalFilesDir(getApplicationContext(), null, "/EngeenerForum/");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
                 Toast.makeText(getApplicationContext(), "Загрузка", //To notify the Client that the file is being downloaded
@@ -265,7 +262,7 @@ Log.d("vvv",url);
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
         super.onCreateContextMenu(contextMenu, view, contextMenuInfo);
 
-        final WebView.HitTestResult webViewHitTestResult = webView.getHitTestResult();//олучает тип данных на которые нажали
+        final WebView.HitTestResult webViewHitTestResult = webView.getHitTestResult();//получает тип данных на которые нажали
 
         if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||//если тип данных картинка или ссылка на картинку
                 webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
@@ -281,13 +278,18 @@ Log.d("vvv",url);
 
                             if (URLUtil.isValidUrl(DownloadImageURL)) {//проверяем является ли адресом DownloadImageURL
 
+
                                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
                                 //------------------------COOKIE!!------------------------
                                 String cookies = CookieManager.getInstance().getCookie(DownloadImageURL);
                                 request.addRequestHeader("cookie", cookies);
-                                
+
                                 //------------------------COOKIE!!------------------------
+
+
                                 request.allowScanningByMediaScanner();
+
+                                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS + "/EngeenerForum/", "downloadfile.jpg");
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                 DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                                 downloadManager.enqueue(request);
