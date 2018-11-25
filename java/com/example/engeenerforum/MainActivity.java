@@ -9,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Picture;
 import android.icu.text.MessagePattern;
 import android.net.Uri;
 import android.os.Build;
@@ -19,8 +22,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.Time;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -32,8 +39,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
-
+    final int MENU_SAVE_ID = 1;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -101,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         webView =  findViewById(R.id.ifView);
         assert webView != null;
-
+        registerForContextMenu(webView);//регистрируем контекстное меню
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccess(true);//Включает или отключает доступ к файлам внутри WebView.
@@ -121,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         webView.setWebChromeClient(new WebChromeClient() {
 
+            //загрузить файл на сайт
             //For Android 3.0+
             public void openFileChooser(ValueCallback<Uri> uploadMsg) {
 
@@ -141,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActivityForResult(
                         Intent.createChooser(i, "File Browser"),//предоставляем окно выбора программы
                         FCR);
-            }
 
+            }
             //For Android 4.1+
             public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
 
@@ -202,6 +214,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+      //загрузить файл на сайт
+//скачивание файлов
+
         webView.setDownloadListener(new DownloadListener() {
 
             @Override
@@ -241,14 +256,60 @@ Log.d("vvv",url);
 
             }
         });
-        webView.loadUrl("http://liftovik.listbb.ru/index.php");
+//скачивание файлов
+        webView.loadUrl("http://liftovik.listbb.ru/index.php");//запуск сайта
         // webView.loadUrl("http://zaycev.net/pages/46408/4640896.shtml");
-    }
 
+    }
+    //контекстное меню
+    @Override
+    public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+        super.onCreateContextMenu(contextMenu, view, contextMenuInfo);
+
+        final WebView.HitTestResult webViewHitTestResult = webView.getHitTestResult();//олучает тип данных на которые нажали
+
+        if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||//если тип данных картинка или ссылка на картинку
+                webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+
+            contextMenu.setHeaderTitle("Сохранить изображение?");//заголовок конт меню
+
+            contextMenu.add(0, 1, 0, "Да!") //добавляем кнопку ДА в конт меню
+                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {//слушатель нажатия кнопки да
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+
+                            String DownloadImageURL = webViewHitTestResult.getExtra(); //получает адрес от объекта на который нажимаем
+
+                            if (URLUtil.isValidUrl(DownloadImageURL)) {//проверяем является ли адресом DownloadImageURL
+
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
+                                request.allowScanningByMediaScanner();
+                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                downloadManager.enqueue(request);
+
+                                Toast.makeText(MainActivity.this, "Изображение загружено", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Не удалось загрузить", Toast.LENGTH_LONG).show();
+                            }
+                            return false;
+                        }
+                    });
+            contextMenu.add(0, 2, 0, "Нет!")
+                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            return false;
+
+                        }
+                    });
+        }
+    }
     // Create an image file
     private File createImageFile() throws IOException {
 
-        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        @SuppressLint("SimpleDateFormat")
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "img_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(imageFileName, ".jpg", storageDir);
@@ -285,4 +346,6 @@ Log.d("vvv",url);
             Toast.makeText(getApplicationContext(), "Failed loading app!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }
