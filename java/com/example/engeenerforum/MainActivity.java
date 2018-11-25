@@ -232,9 +232,8 @@ Log.d("vvv",url);
                 //------------------------COOKIE!!------------------------
                 String cookies = CookieManager.getInstance().getCookie(url);
                 request.addRequestHeader("cookie", cookies);
-                //------------------------COOKIE!!------------------------
                 request.addRequestHeader("User-Agent", userAgent);
-
+                  //------------------------COOKIE!!------------------------
 
                // String fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
                 String contentDispositionSplit[] = contentDisposition.split("''");
@@ -283,12 +282,17 @@ Log.d("vvv",url);
                             if (URLUtil.isValidUrl(DownloadImageURL)) {//проверяем является ли адресом DownloadImageURL
 
                                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
+                                //------------------------COOKIE!!------------------------
+                                String cookies = CookieManager.getInstance().getCookie(DownloadImageURL);
+                                request.addRequestHeader("cookie", cookies);
+                                
+                                //------------------------COOKIE!!------------------------
                                 request.allowScanningByMediaScanner();
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                 DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                                 downloadManager.enqueue(request);
 
-                                Toast.makeText(MainActivity.this, "Изображение загружено", Toast.LENGTH_LONG).show();
+                                Toast.makeText(MainActivity.this, "Загрузка", Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(MainActivity.this, "Не удалось загрузить", Toast.LENGTH_LONG).show();
                             }
@@ -343,7 +347,7 @@ Log.d("vvv",url);
 
     public class Callback extends WebViewClient {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            Toast.makeText(getApplicationContext(), "Failed loading app!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Не возможно загрузить!", Toast.LENGTH_SHORT).show();
         }
     }
 
