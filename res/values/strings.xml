@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">EngeenerForum</string>
+    <string name="start">старт</string>
+    <string name="stop">стоп</string>
 </resources>

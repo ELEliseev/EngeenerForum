@@ -1,18 +1,13 @@
-package com.example.engeenerforum;
+package com.example.EngeenerForum;
 
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Picture;
-import android.icu.text.MessagePattern;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,11 +17,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -37,29 +30,27 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
-import static android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE;
-import static android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
+
     private final static int FCR = 1;
+    String sait = "http://liftovik.listbb.ru/index.php";
     WebView webView;
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
-    final int MENU_SAVE_ID = 1;
+
+    Button btnStart;
+    Button btnStop;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -105,10 +96,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //-------------------------кнопки-----------------------------------------------------------------
+        btnStart =findViewById(R.id.btnStart);
+        btnStop =findViewById(R.id.btnStop);
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService(new Intent(MainActivity.this, MyService.class));
+            }
+        });
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                 stopService(new Intent(MainActivity.this, MyService.class));
+            }
+        });
+        //-------------------------кнопки-----------------------------------------------------------------
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
+
 
         webView =  findViewById(R.id.ifView);
         assert webView != null;
@@ -134,36 +141,36 @@ public class MainActivity extends AppCompatActivity {
 
             //загрузить файл на сайт
             //For Android 3.0+
-            public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-
-                mUM = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
-                MainActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), FCR);
-            }
+           // public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+//
+           //     mUM = uploadMsg;
+           //     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+           //     i.addCategory(Intent.CATEGORY_OPENABLE);
+           //     i.setType("*/*");
+           //     MainActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), FCR);
+           // }
 
             // For Android 3.0+, above method not supported in some android 3+ versions, in such case we use this
-            public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
+         //  public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
 
-                mUM = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);//создаем неявное намерение выбрать файл
-                i.addCategory(Intent.CATEGORY_OPENABLE);//присваеваем категорю .
-                i.setType("*/*");//тип откр файлов
-                MainActivity.this.startActivityForResult(
-                        Intent.createChooser(i, "File Browser"),//предоставляем окно выбора программы
-                        FCR);
+         //      mUM = uploadMsg;
+         //      Intent i = new Intent(Intent.ACTION_GET_CONTENT);//создаем неявное намерение выбрать файл
+         //      i.addCategory(Intent.CATEGORY_OPENABLE);//присваеваем категорю .
+         //      i.setType("*/*");//тип откр файлов
+         //      MainActivity.this.startActivityForResult(
+         //              Intent.createChooser(i, "File Browser"),//предоставляем окно выбора программы
+         //              FCR);
 
-            }
+         //  }
             //For Android 4.1+
-            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+         //   public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
 
-                mUM = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
-                MainActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), MainActivity.FCR);
-            }
+         //       mUM = uploadMsg;
+         //       Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+         //       i.addCategory(Intent.CATEGORY_OPENABLE);
+         //       i.setType("*/*");
+         //       MainActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), MainActivity.FCR);
+         //   }
 
             //For Android 5.0+
             public boolean onShowFileChooser(
@@ -184,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                         photoFile = createImageFile();
                         takePictureIntent.putExtra("PhotoPath", mCM);
                     } catch (IOException ex) {
-                        Log.e(TAG, "Image file creation failed", ex);
+                        Log.e("myError", "Image file creation failed", ex);
                     }
                     if (photoFile != null) {
                         mCM = "file:" + photoFile.getAbsolutePath();
@@ -253,8 +260,8 @@ Log.d("vvv",url);
             }
         });
 //скачивание файлов
-        webView.loadUrl("http://liftovik.listbb.ru/index.php");//запуск сайта
-        // webView.loadUrl("http://zaycev.net/pages/46408/4640896.shtml");
+        webView.loadUrl(sait);//запуск сайта
+
 
     }
     //контекстное меню
@@ -352,6 +359,8 @@ Log.d("vvv",url);
             Toast.makeText(getApplicationContext(), "Не возможно загрузить!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
 
 }
