@@ -23,11 +23,13 @@ public class MyService extends Service {
     // Идентификатор уведомления
     private static final int NOTIFY_ID = 101;
     private static final String NOTIFICATION_CHANNEL_ID ="1" ;
-    int notif=0;
-    int oldnotif=0;
+
+    String notif="0";
+    String oldnotif="0";
     final String LOG_TAG = "myLogs";
     Handler handler;
     Runnable runnable;
+
     public void onCreate() {
         super.onCreate();
 
@@ -50,12 +52,14 @@ public class MyService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
     void someTask() {
-
+//-----------------------------------------------------------------------------
         new Thread() {
             public void run() {
-                final JSONObject json = RemoteFetch.getJSON(getApplicationContext());
+                final JSONObject json = RemoteFetch.getJSON();
 
                 Log.d(LOG_TAG, "render: " + json);
+
+        //----------------------------------------------------------------------
                 if(json == null){
                     handler.post(new Runnable(){
                         public void run(){
@@ -66,20 +70,36 @@ public class MyService extends Service {
                 } else {
                     handler.post(new Runnable(){
                         public void run(){
-                            if (oldnotif == 0 && notif == 1) {
-                                oldnotif = 1;
-                                sendNotif();
-                            }
-                            if (notif == 0) { oldnotif = 0; }
+                            renderJson(json);
 
                         }
                     });
                 }
-
             }
         }.start();
+
+
        // stopSelf();
     }
+    private void renderJson(JSONObject json){
+       String number ;
+         try {
+      number=json.getString("count");
+      for(int count=0; count<Integer.parseInt(number); count++) {
+          notif = json.getJSONObject(String.valueOf(count)).getString("sent");
+          if (oldnotif.equals("0")   && notif.equals("1")  ) {
+              oldnotif = "1";
+              sendNotif();
+          }
+          if (notif.equals("0") ) {
+              oldnotif = "0";
+          }
+      }
+         }catch(Exception e){
+             Log.e(LOG_TAG, "One or more fields not found in the JSON data");
+         }
+     }
+
     //-----------------------------уведомления----------------------------------------------------------
 
 
@@ -110,7 +130,7 @@ public class MyService extends Service {
             Notification notification =builder.build();
 
             notificationManager.notify(NOTIFY_ID, notification);
-        } else {
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             Notification.Builder  builder = new Notification.Builder(this);
             builder.setContentIntent(contentIntent)
 
@@ -119,7 +139,12 @@ public class MyService extends Service {
                     .setContentText("Получено новое сообщение") // Текст уведомления
                     .setWhen(System.currentTimeMillis())
                     .setAutoCancel(true); // автоматически закрыть уведомление после нажатия
-            Notification notification =builder.build();
+            Notification notification = null;
+
+
+                notification = builder.build();
+
+
 
             notificationManager.notify(NOTIFY_ID, notification);
 

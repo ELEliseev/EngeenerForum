@@ -4,27 +4,29 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.util.Locale;
-
 import org.json.JSONObject;
-
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 
 public class RemoteFetch {
 
-    private static final String ENGEENER_FORUM_API =
-            "http://192.168.31.140/site/api.php?api_key=mudofan&login=Lifter";
+    private static final String ENGEENER_FORUM_API = "http://192.168.31.140/site/api.php?api_key=mudofan&login=Lifter";
+    private static final String LOG_TAG ="myLogs" ;
 
-    public static JSONObject getJSON(Context context){
+
+    @Nullable
+    public static JSONObject getJSON(){
         try {
+
             URL url = new URL(ENGEENER_FORUM_API);
-            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        //    connection.addRequestProperty("x-api-key", context.getString(R.string.open_weather_maps_app_id));
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
+            HttpURLConnection connection =
+                    (HttpURLConnection) url.openConnection();
+
+
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             StringBuffer json = new StringBuffer(1024);
             String tmp="";
@@ -39,33 +41,12 @@ public class RemoteFetch {
             //if(data.getInt("cod") != 200){
           //      return null;
            // }
-
+            //Log.d(LOG_TAG, "читаем в буф"+data);
             return data;
         }catch(Exception e){
+
             return null;
         }
     }
-  // private void renderJson(JSONObject json){
-  //     try {
-  //         cityField.setText(json.getString("name").toUpperCase(Locale.US) +
-  //                 ", " +
-  //                 json.getJSONObject("sys").getString("country"));
-  //         Log.d("ППЦ", "renderWeather: " +cityField.getText());
-  //         JSONObject details = json.getJSONArray("weather").getJSONObject(0);
-  //         JSONObject main = json.getJSONObject("main");
 
-  //         currentTemperatureField.setText( main.getInt("temp")+ " ℃");
-  //         Log.d("ППЦ", "renderWeather: " +currentTemperatureField.getText());
-  //         DateFormat df = DateFormat.getDateTimeInstance();
-
-
-
-  //         setWeatherIcon(details.getInt("id"),
-  //                 json.getJSONObject("sys").getLong("sunrise") * 1000,
-  //                 json.getJSONObject("sys").getLong("sunset") * 1000);
-
-  //     }catch(Exception e){
-  //         Log.e("SimpleWeather", "One or more fields not found in the JSON data");
-  //     }
-  // }
 }
