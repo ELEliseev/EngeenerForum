@@ -1,10 +1,12 @@
-package com.example.EngeenerForum;
+package com.example.engeenerforum;
 
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -20,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -97,20 +100,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //-------------------------кнопки-----------------------------------------------------------------
-        btnStart =findViewById(R.id.btnStart);
-        btnStop =findViewById(R.id.btnStop);
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startService(new Intent(MainActivity.this, MyService.class));
-            }
-        });
-        btnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                 stopService(new Intent(MainActivity.this, MyService.class));
-            }
-        });
+//        btnStart =findViewById(R.id.btnStart);
+//        btnStop =findViewById(R.id.btnStop);
+//        btnStart.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startService(new Intent(MainActivity.this, MyService.class));
+//            }
+//        });
+//        btnStop.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                 stopService(new Intent(MainActivity.this, MyService.class));
+//            }
+//        });
         //-------------------------кнопки-----------------------------------------------------------------
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
@@ -362,6 +365,23 @@ Log.d("vvv",url);
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
 
+        menu.add("Уведомления");
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+
+        Intent intent = new Intent(MainActivity.this, Settings.class);
+        startActivity(intent);
+        return super.onOptionsItemSelected(item);
+    }
 
 }

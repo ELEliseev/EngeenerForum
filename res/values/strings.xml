@@ -2,4 +2,6 @@
     <string name="app_name">EngeenerForum</string>
     <string name="start">старт</string>
     <string name="stop">стоп</string>
+    <string name="save">Сохранить</string>
+    <string name="stopService">Остановить сервис</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.EngeenerForum;
+package com.example.engeenerforum;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
@@ -14,9 +15,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONObject;
-
-import java.util.concurrent.TimeUnit;
-
 
 
 public class MyService extends Service {
@@ -29,9 +27,14 @@ public class MyService extends Service {
     final String LOG_TAG = "myLogs";
     Handler handler;
     Runnable runnable;
-
+    SharedPreferences sPref;
+    String login;
+    final String SAVED_TEXT = "saved_text";
     public void onCreate() {
         super.onCreate();
+        startForeground(1,new Notification());
+        sPref = getSharedPreferences("MyPref",MODE_PRIVATE);
+        login = sPref.getString(SAVED_TEXT, "");
 
         Log.d(LOG_TAG, "onCreate");
     }
@@ -55,7 +58,8 @@ public class MyService extends Service {
 //-----------------------------------------------------------------------------
         new Thread() {
             public void run() {
-                final JSONObject json = RemoteFetch.getJSON();
+
+                final JSONObject json = RemoteFetch.getJSON(login);
 
                 Log.d(LOG_TAG, "render: " + json);
 
@@ -86,7 +90,12 @@ public class MyService extends Service {
          try {
       number=json.getString("count");
       for(int count=0; count<Integer.parseInt(number); count++) {
-          notif = json.getJSONObject(String.valueOf(count)).getString("sent");
+          if ((json.getJSONObject(String.valueOf(count)).getString("sent")).equals("1")){
+              notif="1";
+              break;
+          }
+          else{notif="0";}
+      }
           if (oldnotif.equals("0")   && notif.equals("1")  ) {
               oldnotif = "1";
               sendNotif();
@@ -94,7 +103,7 @@ public class MyService extends Service {
           if (notif.equals("0") ) {
               oldnotif = "0";
           }
-      }
+
          }catch(Exception e){
              Log.e(LOG_TAG, "One or more fields not found in the JSON data");
          }
