@@ -5,8 +5,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -19,7 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -33,7 +31,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
+
 import android.widget.Toast;
 
 import java.io.File;
@@ -46,14 +44,13 @@ import static android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
 public class MainActivity extends AppCompatActivity {
 
     private final static int FCR = 1;
-    String sait = "http://liftovik.listbb.ru/index.php";
+    //String sait = "http://liftovik.listbb.ru/index.php";
+    String sait = "http://192.168.31.140/site/forum";
     WebView webView;
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
 
-    Button btnStart;
-    Button btnStop;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -195,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         photoFile = createImageFile();
                         takePictureIntent.putExtra("PhotoPath", mCM);
                     } catch (IOException ex) {
-                        Log.e("myError", "Image file creation failed", ex);
+                     //   Log.e("myError", "Image file creation failed", ex);
                     }
                     if (photoFile != null) {
                         mCM = "file:" + photoFile.getAbsolutePath();
@@ -234,10 +231,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
-Log.d("vvv",url);
-                Log.d("vvv",userAgent);
-                Log.d("vvv",contentDisposition);
-                Log.d("vvv",mimetype);
+
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setMimeType(mimetype);
                 //------------------------COOKIE!!------------------------
@@ -249,7 +243,7 @@ Log.d("vvv",url);
                // String fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
                 String contentDispositionSplit[] = contentDisposition.split("''");
                 String fileName = contentDispositionSplit[1].trim();
-                Log.d("vvv",fileName);
+              //  Log.d("vvv",fileName);
                 request.allowScanningByMediaScanner();
 
                 request.setAllowedOverRoaming(false);

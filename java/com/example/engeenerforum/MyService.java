@@ -11,8 +11,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.Toast;
+
 
 import org.json.JSONObject;
 
@@ -24,7 +23,7 @@ public class MyService extends Service {
 
     String notif="0";
     String oldnotif="0";
-    final String LOG_TAG = "myLogs";
+   // final String LOG_TAG = "myLogs";
     Handler handler;
     Runnable runnable;
     SharedPreferences sPref;
@@ -36,11 +35,11 @@ public class MyService extends Service {
         sPref = getSharedPreferences("MyPref",MODE_PRIVATE);
         login = sPref.getString(SAVED_TEXT, "");
 
-        Log.d(LOG_TAG, "onCreate");
+        //Log.d(LOG_TAG, "onCreate");
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "onStartCommand");
+       // Log.d(LOG_TAG, "onStartCommand");
         handler = new Handler();
         runnable =new Runnable() {
             @Override
@@ -61,14 +60,13 @@ public class MyService extends Service {
 
                 final JSONObject json = RemoteFetch.getJSON(login);
 
-                Log.d(LOG_TAG, "render: " + json);
+               // Log.d(LOG_TAG, "render: " + json);
 
         //----------------------------------------------------------------------
                 if(json == null){
                     handler.post(new Runnable(){
                         public void run(){
-                            Toast.makeText(getApplicationContext(),"нет данных",
-                                    Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(getApplicationContext(),"нет данных", Toast.LENGTH_LONG).show();
                         }
                     });
                 } else {
@@ -105,7 +103,7 @@ public class MyService extends Service {
           }
 
          }catch(Exception e){
-             Log.e(LOG_TAG, "One or more fields not found in the JSON data");
+           //  Log.e(LOG_TAG, "One or more fields not found in the JSON data");
          }
      }
 
@@ -163,7 +161,7 @@ public class MyService extends Service {
 
 
     public IBinder onBind(Intent intent) {
-        Log.d(LOG_TAG, "onBind");
+       // Log.d(LOG_TAG, "onBind");
         return null;
     }
 
@@ -171,6 +169,6 @@ public class MyService extends Service {
     public void onDestroy() {
         handler.removeCallbacks(runnable);
         super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
+       // Log.d(LOG_TAG, "onDestroy");
     }
 }

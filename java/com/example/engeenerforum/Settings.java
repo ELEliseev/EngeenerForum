@@ -20,7 +20,7 @@ public class Settings extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         userEditText =  findViewById(R.id.login);
         Button button =findViewById(R.id.button);
-        Button stop =findViewById(R.id.stService);
+     //   Button stop =findViewById(R.id.stService);
 button.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
@@ -32,12 +32,12 @@ button.setOnClickListener(new View.OnClickListener() {
         startService(new Intent(Settings.this, MyService.class));
     }
 });
-stop.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        stopService(new Intent(Settings.this, MyService.class));
-    }
-});
+//stop.setOnClickListener(new View.OnClickListener() {
+//    @Override
+//    public void onClick(View v) {
+//        stopService(new Intent(Settings.this, MyService.class));
+//    }
+//});
 
     }
 }

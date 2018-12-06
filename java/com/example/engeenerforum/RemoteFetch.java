@@ -7,14 +7,14 @@ import java.net.URL;
 import org.json.JSONObject;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
+
 
 
 public class RemoteFetch {
 
     private static final String ENGEENER_FORUM_API = "http://192.168.31.140/site/api.php?api_key=lifter&login=";
 
-    private static final String LOG_TAG ="myLogs" ;
+   // private static final String LOG_TAG ="myLogs" ;
 
 
 
@@ -29,7 +29,7 @@ public class RemoteFetch {
             URL url = new URL(String.format(ENGEENER_FORUM_API+login));
             HttpURLConnection connection =
                     (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "читаем "+login);
+         //   Log.d(LOG_TAG, "читаем "+login);
 
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -47,7 +47,7 @@ public class RemoteFetch {
             //if(data.getInt("cod") != 200){
           //      return null;
            // }
-            Log.d(LOG_TAG, "читаем в буф"+login);
+      //      Log.d(LOG_TAG, "читаем в буф"+login);
             return data;
         }catch(Exception e){
 
