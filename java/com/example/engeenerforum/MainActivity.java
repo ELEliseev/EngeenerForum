@@ -240,9 +240,9 @@ public class MainActivity extends AppCompatActivity {
                 request.addRequestHeader("User-Agent", userAgent);
                   //------------------------COOKIE!!------------------------
 
-               // String fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
-                String contentDispositionSplit[] = contentDisposition.split("''");
-                String fileName = contentDispositionSplit[1].trim();
+                String fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
+               // String contentDispositionSplit[] = contentDisposition.split("''");
+               // String fileName = contentDispositionSplit[1].trim();
               //  Log.d("vvv",fileName);
                 request.allowScanningByMediaScanner();
 
